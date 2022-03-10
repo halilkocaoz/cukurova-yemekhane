@@ -1,4 +1,4 @@
-name: web api
+name: Cu.Yemekhane.API.Web Build
 
 on:
   push:
