@@ -1,1 +1,1 @@
-# Cu.Yemekhane.Bot.API
+# Cu.Yemekhane.API

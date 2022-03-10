@@ -1,4 +1,4 @@
-name: Cu.Yemekhane.API.Web Build
+name: Cu.Yemekhane.API Build
 
 on:
   push:
@@ -17,6 +17,6 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Restore dependencies
-        run: dotnet restore ./Cu.Yemekhane.API/Cu.Yemekhane.API.Web/Cu.Yemekhane.API.Web.csproj
+        run: dotnet restore ./Cu.Yemekhane.API/Cu.Yemekhane.API.csproj
       - name: Build
-        run: dotnet build --configuration Release ./Cu.Yemekhane.API/Cu.Yemekhane.API.Web/Cu.Yemekhane.API.Web.csproj
+        run: dotnet build --configuration Release ./Cu.Yemekhane.API/Cu.Yemekhane.API.csproj

@@ -2,7 +2,7 @@ using System.Text;
 using Cu.Yemekhane.Common.Data.Models;
 using HtmlAgilityPack;
 
-namespace Cu.Yemekhane.API.Web.Services;
+namespace Cu.Yemekhane.API.Services;
 
 public interface IWebScrapper
 {

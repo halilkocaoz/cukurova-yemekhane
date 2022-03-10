@@ -1,4 +1,4 @@
-using Cu.Yemekhane.API.Web.Services;
+using Cu.Yemekhane.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

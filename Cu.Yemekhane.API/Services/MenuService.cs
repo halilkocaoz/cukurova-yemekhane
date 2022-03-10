@@ -3,7 +3,7 @@ using Cu.Yemekhane.Common;
 using System.Globalization;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Cu.Yemekhane.API.Web.Services;
+namespace Cu.Yemekhane.API.Services;
 
 public interface IMenuService
 {

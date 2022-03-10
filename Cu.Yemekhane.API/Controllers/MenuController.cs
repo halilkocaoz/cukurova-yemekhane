@@ -1,9 +1,9 @@
-using Cu.Yemekhane.API.Web.Services;
+using Cu.Yemekhane.API.Services;
 using Cu.Yemekhane.Common;
 using Cu.Yemekhane.Common.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Cu.Yemekhane.API.Web.Controllers
+namespace Cu.Yemekhane.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]

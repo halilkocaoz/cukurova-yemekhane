@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Cu.Yemekhane.API.Web": {
+    "Cu.Yemekhane.API": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
