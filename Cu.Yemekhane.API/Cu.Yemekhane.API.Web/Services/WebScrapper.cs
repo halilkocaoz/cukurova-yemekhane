@@ -6,7 +6,7 @@ namespace Cu.Yemekhane.API.Web.Services;
 
 public interface IWebScrapper
 {
-    Task<List<Menu>> ScrapMenus();
+    List<Menu> ScrapMenus();
 }
 
 public class WebScrapper : IWebScrapper
@@ -15,7 +15,7 @@ public class WebScrapper : IWebScrapper
     private const string cuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
     public WebScrapper() => _htmlWeb = new();
 
-    public async Task<List<Menu>> ScrapMenus()
+    public List<Menu> ScrapMenus()
     {
         List<Menu> result = new();
         List<Food> tempFoods = new();

@@ -16,9 +16,9 @@ namespace Cu.Yemekhane.API.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Menu>> GetMenusAsync()
+        public List<Menu> GetMenusAsync()
         {
-            return await _menuService.GetMenus();
+            return _menuService.GetMenus();
         }
     }
 }
