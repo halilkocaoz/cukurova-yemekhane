@@ -10,4 +10,9 @@ public class Date
     public string Day { get; private set; }
     public string Month { get; private set; }
     public string Year { get; private set; }
+
+    public override string ToString()
+    {
+        return $"{Day}.{Month}.{Year}";
+    }
 }

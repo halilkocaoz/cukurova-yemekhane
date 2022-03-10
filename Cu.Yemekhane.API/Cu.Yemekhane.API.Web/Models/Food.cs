@@ -10,4 +10,9 @@ public class Food
 
     public string Name { get; private set; }
     public int Calories { get; private set; }
+
+    public override string ToString()
+    {
+        return $"{Name} - {Calories} calories.";
+    }
 }
