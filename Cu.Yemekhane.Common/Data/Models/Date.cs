@@ -1,4 +1,4 @@
-namespace Cu.Yemekhane.API.Web.Models.Data;
+namespace Cu.Yemekhane.Common.Data.Models;
 public class Date
 {
     public Date(string day, string month, string year)
