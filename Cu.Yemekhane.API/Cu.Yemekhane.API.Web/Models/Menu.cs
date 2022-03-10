@@ -4,11 +4,11 @@ namespace Cu.Yemekhane.API.Web.Models;
 
 public class Menu
 {
-    public Menu(Date date, List<Food> foods, int totalCalories)
+    public Menu(Date date, List<Food> foods, int? totalCalories)
     {
         Date = date;
         Foods = foods;
-        TotalCalories = totalCalories;
+        TotalCalories = totalCalories is 0 or null ? foods.Sum(x => x.Calories) : totalCalories.Value;
     }
 
     public Date Date { get; private set; }
