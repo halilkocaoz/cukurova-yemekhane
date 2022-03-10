@@ -5,18 +5,25 @@ namespace Cu.Yemekhane.API.Web.Services;
 public interface IMenuService
 {
     Task<List<Menu>> GetMenus();
-    Task<List<Menu>> GetMenuByDate(Date date);
+    Task<Menu> GetMenuByDate(string date);
 }
 
 public class MenuService : IMenuService
 {
-    public Task<List<Menu>> GetMenuByDate(Date date)
+    private readonly IWebScrapper _webScrapper;
+
+    public MenuService(IWebScrapper webScrapper)
+    {
+        _webScrapper = webScrapper;
+    }
+
+    public async Task<Menu> GetMenuByDate(string date)
     {
         throw new NotImplementedException();
     }
 
-    public Task<List<Menu>> GetMenus()
+    public async Task<List<Menu>> GetMenus()
     {
-        throw new NotImplementedException();
+        return await _webScrapper.ScrapMenus();
     }
 }
