@@ -10,6 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IWebScrapper, WebScrapper>();
 builder.Services.AddSingleton<IMenuService, MenuService>();
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
