@@ -1,0 +1,22 @@
+name: web api
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore ./Cu.Yemekhane.API/Cu.Yemekhane.API.Web/Cu.Yemekhane.API.Web.csproj
+      - name: Build
+        run: dotnet build --configuration Release ./Cu.Yemekhane.API/Cu.Yemekhane.API.Web/Cu.Yemekhane.API.Web.csproj
