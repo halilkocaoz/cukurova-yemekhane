@@ -1,11 +1,12 @@
 using Cu.Yemekhane.API.Web.Services;
+using Cu.Yemekhane.Common;
 using Cu.Yemekhane.Common.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cu.Yemekhane.API.Web.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class MenuController : ControllerBase
     {
         private readonly IMenuService _menuService;
@@ -16,9 +17,15 @@ namespace Cu.Yemekhane.API.Web.Controllers
         }
 
         [HttpGet]
-        public List<Menu> GetMenusAsync()
+        public ApiResponse<List<Menu>> GetMenus()
         {
             return _menuService.GetMenus();
+        }
+
+        [HttpGet("{date}")]
+        public ApiResponse<Menu> GetMenu([FromRoute] string date)
+        {
+            return _menuService.GetMenuByDate(date);
         }
     }
 }

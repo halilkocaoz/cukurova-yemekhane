@@ -1,11 +1,13 @@
 using Cu.Yemekhane.Common.Data.Models;
+using Cu.Yemekhane.Common;
+
 
 namespace Cu.Yemekhane.API.Web.Services;
 
 public interface IMenuService
 {
-    List<Menu> GetMenus();
-    Menu GetMenuByDate(string date);
+    ApiResponse<List<Menu>> GetMenus();
+    ApiResponse<Menu> GetMenuByDate(string date);
 }
 
 public class MenuService : IMenuService
@@ -17,13 +19,16 @@ public class MenuService : IMenuService
         _webScrapper = webScrapper;
     }
 
-    public Menu GetMenuByDate(string date)
+    public ApiResponse<Menu> GetMenuByDate(string date)
     {
         throw new NotImplementedException();
     }
 
-    public List<Menu> GetMenus()
+    public ApiResponse<List<Menu>> GetMenus()
     {
-        return _webScrapper.ScrapMenus();
+        return new ApiResponse<List<Menu>>
+        {
+            Data = _webScrapper.ScrapMenus()
+        };
     }
 }
