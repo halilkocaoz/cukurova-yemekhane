@@ -1,19 +1,27 @@
-using System.Net;
 using Cu.Yemekhane.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IWebScrapper, WebScrapper>();
 builder.Services.AddSingleton<IMenuService, MenuService>();
-builder.Services.AddMemoryCache();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("default", builder =>
+    {
+        builder
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowAnyOrigin();
+    });
+});
 var app = builder.Build();
+app.MapControllers();
 
 app.UseSwagger();
 app.UseSwaggerUI(conf =>
@@ -21,10 +29,8 @@ app.UseSwaggerUI(conf =>
     conf.SwaggerEndpoint("/swagger/v1/swagger.json", "Cu.Yemekhane.API");
     conf.RoutePrefix = String.Empty;
 });
+app.UseCors("default");
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
-app.MapControllers();
 app.Run();
