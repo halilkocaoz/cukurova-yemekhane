@@ -13,13 +13,21 @@ public class WebScrapper : IWebScrapper
 {
     private readonly HtmlWeb _htmlWeb;
     private const string cuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
-    public WebScrapper() => _htmlWeb = new();
+    public WebScrapper()
+    {
+        System.Text.EncodingProvider provider = System.Text.CodePagesEncodingProvider.Instance;
+        Encoding.RegisterProvider(provider);
+        _htmlWeb = new HtmlWeb
+        {
+            AutoDetectEncoding = false,
+            OverrideEncoding = Encoding.GetEncoding("iso-8859-9"),
+        };
+    }
 
     public List<Menu> ScrapMenus()
     {
         List<Menu> result = new();
         List<Food> tempFoods = new();
-
         var doc = _htmlWeb.Load(cuYemekhaneUrl);
         var menuDivNodes = doc.DocumentNode.SelectNodes("//div[@data-animation='flipInY']").ToList();
         menuDivNodes.ForEach(menuDivNode =>
