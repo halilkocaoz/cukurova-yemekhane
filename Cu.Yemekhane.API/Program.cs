@@ -12,11 +12,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IWebScrapper, WebScrapper>();
 builder.Services.AddSingleton<IMenuService, MenuService>();
 builder.Services.AddMemoryCache();
-int port = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "5007");
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.Listen(IPAddress.Any, port);
-});
 
 var app = builder.Build();
 
