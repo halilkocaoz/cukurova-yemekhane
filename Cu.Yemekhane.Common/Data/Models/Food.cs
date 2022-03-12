@@ -13,6 +13,6 @@ public class Food
 
     public override string ToString()
     {
-        return $"{Name} - {Calories} calories.";
+        return $"{Name} - {Calories} kalori.";
     }
 }

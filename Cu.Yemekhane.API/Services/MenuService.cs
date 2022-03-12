@@ -44,7 +44,7 @@ public class MenuService : IMenuService
             response.Data = menus.FirstOrDefault(x => x.Date == date); // add mem cache by date
         }
         else
-            response.ErrorMessage = "Invalid date format, date format must be dd.MM.yyyy";
+            response.ErrorMessage = "Tarih biçimi geçersiz, tarih biçimi gg.AA.yyyy(15.06.2022 -  gg = gün, AA = ay, yyyy=yıl) şeklinde olmalıdır.";
 
         return response;
     }
