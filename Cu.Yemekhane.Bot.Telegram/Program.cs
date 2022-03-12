@@ -35,11 +35,11 @@ async Task handleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
 }
 
 const string helpCommand = "Sana Çukurova Üniversitesinin yemekhane menülerine ulaşman konusunda yardımcı olabilirim.\n" +
-        "/today komutu ile bugünün menüsüne ulaşabilirsin\n" +
-        "/tomorrow komutu ile yarının menüsüne ulaşabilirsin\n" +
-        "/menu 12.03.2022 ile herhangi bir günün menüsüne ulaşabilirsin\n" +
+        "/today komutu ile bugünün menüsüne ulaşabilirsin.\n" +
+        "/tomorrow komutu ile yarının menüsüne ulaşabilirsin.\n" +
+        "/menu 12.03.2022 ile herhangi bir günün menüsüne ulaşabilirsin.\n" +
         "/menu komutunu kullanırken tarih biçimi gün.ay.yıl şeklinde olmalıdır.\n" +
-        "/source komutu ile projelerin kaynağına ulaşabilirsin\n";
+        "/source komutu ile projelerin kaynağına ulaşabilirsin.\n";
 
 async Task<string> generateReply(string messageText)
 {

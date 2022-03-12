@@ -7,3 +7,7 @@ Presents Web API and bots of Çukurova University dining hall.
 ## Cu.Yemekhane.API
 
 [Web API](https://cu-yemekhane.herokuapp.com/index.html)
+
+## Cu.Yemekhane.Bot.Telegram
+
+[https://t.me/cuyemekbot](https://t.me/cuyemekbot)
