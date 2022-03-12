@@ -6,6 +6,13 @@ using Telegram.Bot.Types.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Cu.Yemekhane.Common.Services;
 
+const string helpCommand = "Sana Çukurova Üniversitesinin yemekhane menülerine ulaşman konusunda yardımcı olabilirim.\n" +
+        "/today komutu ile bugünün menüsüne ulaşabilirsin\n" +
+        "/tomorrow komutu ile yarının menüsüne ulaşabilirsin\n" +
+        "/menu 12.03.2022 ile herhangi bir günün menüsüne ulaşabilirsin\n" +
+        "/menu komutunu kullanırken tarih biçimi gün.ay.yıl şeklinde olmalıdır.\n" +
+        "/source komutu ile projelerin kaynağına ulaşabilirsin\n";
+
 var serviceProvider = new ServiceCollection()
     .AddSingleton<IWebApiService, WebApiService>()
     .BuildServiceProvider();
@@ -24,57 +31,63 @@ cts.Cancel();
 
 async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 {
-    if (update.Type != UpdateType.Message)
-        return;
-    if (update.Message!.Type != MessageType.Text)
+    if (update.Type != UpdateType.Message || update.Message!.Type != MessageType.Text)
         return;
 
     var chatId = update.Message.Chat.Id;
     var messageText = update.Message.Text;
 
     Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
-    var messageTextArrs = messageText.Split(' ');
-    string todayAsString = System.DateTime.Now.ToString("dd.MM.yyyy");
-    string selectedDay = string.Empty;
-    string helpCommand = "Sana Çukurova Üniversitesinin yemekhane menülerine ulaşman konusunda yardımcı olabilirim.\n" +
-        "/today komutu ile bugünün menüsüne ulaşabilirsin\n" +
-        $"/menu {System.DateTime.Now.ToString("dd.MM.yyyy")} ile herhangi bir günün menüsüne ulaşabilirsin\n" +
-        "/source komutu ile projenin kaynağına ulaşabilirsin\n";
-    switch (messageTextArrs[0])
+    var replyMessage = await generateReply(messageText);
+    await botClient.SendTextMessageAsync(chatId, replyMessage);
+}
+
+async Task<string> generateReply(string messageText)
+{
+    var splittedMessage = messageText.Split(' ');
+    var dateNowForTurkey = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(3));
+    string todayAsString = dateNowForTurkey.ToString("dd.MM.yyyy");
+    string reply = string.Empty;
+    switch (splittedMessage[0].ToLower())
     {
         case "/start":
-            await botClient.SendTextMessageAsync(chatId,
-                "Heyyo! Ben Cu.Yemekhane.Bot.Telegram,\n" +
-                helpCommand
-                + "\n https://github.com/halilkocaoz/cu-yemekhane");
+            reply = "Heyyo! Ben Cu.Yemekhane.Bot.Telegram,\n" + helpCommand + "\nhttps://github.com/halilkocaoz/cu-yemekhane";
             break;
         case "/today":
-            string menu = await getMenuMessage(todayAsString);
-            await botClient.SendTextMessageAsync(chatId, menu);
+            reply = await getMenuMessage(todayAsString);
+            break;
+        case "/tomorrow":
+            string tomorrowAsString = dateNowForTurkey.AddDays(1).ToString("dd.MM.yyyy");
+            reply = await getMenuMessage(tomorrowAsString);
             break;
         case "/menu":
-            selectedDay = messageTextArrs.Length > 1 ? messageTextArrs[1] : todayAsString;
-            menu = await getMenuMessage(selectedDay);
-            await botClient.SendTextMessageAsync(chatId, menu);
+            if (splittedMessage.Length > 1)
+            {
+                string selectedDay = splittedMessage[1];
+                reply = await getMenuMessage(selectedDay);
+            }
+            else
+                reply = $"Tarih formatında veri girmelisiniz. Örnek:\n/menu {todayAsString}";
             break;
         case "/source":
-            await botClient.SendTextMessageAsync(chatId, "https://github.com/halilkocaoz/cu-yemekhane");
+            reply = "https://github.com/halilkocaoz/cu-yemekhane";
             break;
         case "/help":
-            await botClient.SendTextMessageAsync(chatId, helpCommand);
+            reply = helpCommand;
             break;
         default:
-            await botClient.SendTextMessageAsync(chatId, "Seni anlamadım. Belki ben biraz aptalımdır veya sen, kim bilir.\n/help");
+            reply = "Seni anlamadım. Komutlarımı görmek için /help yazabilirsin.";
             break;
     };
+    return reply;
 }
 
 async Task<string> getMenuMessage(string date)
-{
+{   //todo cache
     var response = await webApiService.GetMenu(date);
     string detail = string.Empty;
     if (string.IsNullOrEmpty(response.ErrorMessage))
-        detail = response.Data is null ? "Bugün için menü bulunamadı" : response.Data.Detail;
+        detail = response.Data is null ? $"{date} tarihi için menü bulunamadı." : response.Data.Detail;
     else
         detail = response.ErrorMessage;
     return detail;
@@ -92,4 +105,3 @@ Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, Cancell
     Console.WriteLine(ErrorMessage);
     return Task.CompletedTask;
 }
-
