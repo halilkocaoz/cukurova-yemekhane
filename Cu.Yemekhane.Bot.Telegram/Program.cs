@@ -3,33 +3,25 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Microsoft.Extensions.DependencyInjection;
 using Cu.Yemekhane.Common.Services;
 
-const string helpCommand = "Sana Çukurova Üniversitesinin yemekhane menülerine ulaşman konusunda yardımcı olabilirim.\n" +
-        "/today komutu ile bugünün menüsüne ulaşabilirsin\n" +
-        "/tomorrow komutu ile yarının menüsüne ulaşabilirsin\n" +
-        "/menu 12.03.2022 ile herhangi bir günün menüsüne ulaşabilirsin\n" +
-        "/menu komutunu kullanırken tarih biçimi gün.ay.yıl şeklinde olmalıdır.\n" +
-        "/source komutu ile projelerin kaynağına ulaşabilirsin\n";
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<IWebApiService, WebApiService>();
 
-var serviceProvider = new ServiceCollection()
-    .AddSingleton<IWebApiService, WebApiService>()
-    .BuildServiceProvider();
-var webApiService = serviceProvider.GetService<IWebApiService>();
+var app = builder.Build();
+app.MapGet("/ping", () => "pong");
 
-var botClient = new TelegramBotClient("5241998179:AAFPX3Cv4DoKQhxScTLCtKbt9BbyD4DFIxo");
+var serviceProvider = builder.Services.BuildServiceProvider();
+var webApiService = (IWebApiService)serviceProvider.GetService(typeof(IWebApiService));
 
-using var cts = new CancellationTokenSource();
+string telegramApiToken = Environment.GetEnvironmentVariable("TELEGRAM_API_TOKEN");
+var botClient = new TelegramBotClient(telegramApiToken);
+botClient.StartReceiving(handleUpdateAsync,
+    handleErrorAsync,
+    new ReceiverOptions { AllowedUpdates = { } },
+    CancellationToken.None);
 
-var receiverOptions = new ReceiverOptions { AllowedUpdates = { } };
-
-botClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cts.Token);
-
-Console.ReadLine();
-cts.Cancel();
-
-async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+async Task handleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 {
     if (update.Type != UpdateType.Message || update.Message!.Type != MessageType.Text)
         return;
@@ -42,8 +34,16 @@ async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
     await botClient.SendTextMessageAsync(chatId, replyMessage);
 }
 
+const string helpCommand = "Sana Çukurova Üniversitesinin yemekhane menülerine ulaşman konusunda yardımcı olabilirim.\n" +
+        "/today komutu ile bugünün menüsüne ulaşabilirsin\n" +
+        "/tomorrow komutu ile yarının menüsüne ulaşabilirsin\n" +
+        "/menu 12.03.2022 ile herhangi bir günün menüsüne ulaşabilirsin\n" +
+        "/menu komutunu kullanırken tarih biçimi gün.ay.yıl şeklinde olmalıdır.\n" +
+        "/source komutu ile projelerin kaynağına ulaşabilirsin\n";
+
 async Task<string> generateReply(string messageText)
 {
+
     var splittedMessage = messageText.Split(' ');
     var dateNowForTurkey = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(3));
     string todayAsString = dateNowForTurkey.ToString("dd.MM.yyyy");
@@ -80,20 +80,20 @@ async Task<string> generateReply(string messageText)
             break;
     };
     return reply;
+
+    async Task<string> getMenuMessage(string date)
+    {   //todo cache
+        var response = await webApiService.GetMenu(date);
+        string detail = string.Empty;
+        if (string.IsNullOrEmpty(response.ErrorMessage))
+            detail = response.Data is null ? $"{date} tarihi için menü bulunamadı." : response.Data.Detail;
+        else
+            detail = response.ErrorMessage;
+        return detail;
+    }
 }
 
-async Task<string> getMenuMessage(string date)
-{   //todo cache
-    var response = await webApiService.GetMenu(date);
-    string detail = string.Empty;
-    if (string.IsNullOrEmpty(response.ErrorMessage))
-        detail = response.Data is null ? $"{date} tarihi için menü bulunamadı." : response.Data.Detail;
-    else
-        detail = response.ErrorMessage;
-    return detail;
-}
-
-Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+Task handleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
 {
     var ErrorMessage = exception switch
     {
@@ -105,3 +105,5 @@ Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, Cancell
     Console.WriteLine(ErrorMessage);
     return Task.CompletedTask;
 }
+
+app.Run();
