@@ -5,6 +5,8 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Cu.Yemekhane.Common.Services;
 using Cu.Yemekhane.Common;
+using Microsoft.Extensions.Caching.Memory;
+using Cu.Yemekhane.Common.Models.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IWebApiService, WebApiService>();
@@ -14,7 +16,8 @@ var app = builder.Build();
 app.MapGet("/ping", () => "pong");
 
 var serviceProvider = builder.Services.BuildServiceProvider();
-var webApiService = (IWebApiService)serviceProvider.GetService(typeof(IWebApiService));
+var _webApiService = (IWebApiService)serviceProvider.GetService(typeof(IWebApiService));
+var _memoryCache = (IMemoryCache)serviceProvider.GetService(typeof(IMemoryCache));
 
 string telegramApiToken = Environment.GetEnvironmentVariable("TELEGRAM_API_TOKEN");
 var botClient = new TelegramBotClient(telegramApiToken);
@@ -55,17 +58,17 @@ async Task<string> generateReply(string messageText)
             reply = "Heyyo! Ben Çukurova Üniversitesi Yemekhane botu,\n" + helpCommand + "\nhttps://github.com/halilkocaoz/cu-yemekhane";
             break;
         case "/today":
-            reply = await getMenuDetailMessage(todayAsString);
+            reply = await getMenuDetailReplyMessage(todayAsString);
             break;
         case "/tomorrow":
             string tomorrowAsString = dateNowForTurkey.AddDays(1).ToString("dd.MM.yyyy");
-            reply = await getMenuDetailMessage(tomorrowAsString);
+            reply = await getMenuDetailReplyMessage(tomorrowAsString);
             break;
         case "/menu":
             if (splittedMessage.Length > 1)
             {
                 string selectedDay = splittedMessage[1];
-                reply = await getMenuDetailMessage(selectedDay);
+                reply = await getMenuDetailReplyMessage(selectedDay);
             }
             else
                 reply = $"Tarih formatında veri girmelisiniz. Örnek:\n/menu {todayAsString}";
@@ -81,25 +84,38 @@ async Task<string> generateReply(string messageText)
             break;
     };
     return reply;
-
-    async Task<string> getMenuDetailMessage(string date)
-    {
-        string detail = string.Empty;
-        if (date.IsParseableAsDate())
-        {
-            var response = await webApiService.GetMenu(date);
-            if (string.IsNullOrEmpty(response.ErrorMessage))
-                detail = response.Data is null ? $"{date} tarihi için menü bulunamadı." : response.Data.Detail;
-            else
-                detail = response.ErrorMessage;
-        }
-        else
-            detail = ErrorMessages.InvalidDateFormat;
-
-        return detail;
-    }
 }
 
+async Task<Cu.Yemekhane.Common.ApiResponse<List<Menu>>> getMenusResponseFromCache()
+{
+    const string cacheKey = "menus_response_cache";
+    if (!_memoryCache.TryGetValue(cacheKey, out Cu.Yemekhane.Common.ApiResponse<List<Menu>> response))
+    {
+        response = await _webApiService.GetMenus();
+        _memoryCache.Set(cacheKey, response, new MemoryCacheEntryOptions
+        {
+            AbsoluteExpiration = DateTime.Now.AddHours(6)
+        });
+    }
+    return response;
+}
+
+async Task<string> getMenuDetailReplyMessage(string date)
+{
+    string menuDetailReply = string.Empty;
+    if (date.IsParseableAsDate())
+    {
+        var menusResponse = await getMenusResponseFromCache();
+        var selectedMenu = menusResponse.Data?.FirstOrDefault(x => x.Date == date);
+        menuDetailReply = selectedMenu is not null
+            ? selectedMenu.Detail
+            : $"{date} tarihi için menü bulunamadı.";
+    }
+    else
+        menuDetailReply = ErrorMessages.InvalidDateFormat;
+
+    return menuDetailReply;
+}
 Task handleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
 {
     var ErrorMessage = exception switch
@@ -114,3 +130,4 @@ Task handleErrorAsync(ITelegramBotClient botClient, Exception exception, Cancell
 }
 
 app.Run();
+
