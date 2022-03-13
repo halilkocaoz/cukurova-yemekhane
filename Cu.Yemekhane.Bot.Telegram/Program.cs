@@ -4,15 +4,19 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Cu.Yemekhane.Common.Services;
+using Microsoft.Extensions.Caching.Memory;
+using Cu.Yemekhane.Common.Data.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IWebApiService, WebApiService>();
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 app.MapGet("/ping", () => "pong");
 
 var serviceProvider = builder.Services.BuildServiceProvider();
 var webApiService = (IWebApiService)serviceProvider.GetService(typeof(IWebApiService));
+var memoryCache = (IMemoryCache)serviceProvider.GetService(typeof(IMemoryCache));
 
 string telegramApiToken = Environment.GetEnvironmentVariable("TELEGRAM_API_TOKEN");
 var botClient = new TelegramBotClient(telegramApiToken);
@@ -35,15 +39,14 @@ async Task handleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
 }
 
 const string helpCommand = "Sana Çukurova Üniversitesinin yemekhane menülerine ulaşman konusunda yardımcı olabilirim.\n" +
-        "/today komutu ile bugünün menüsüne ulaşabilirsin.\n" +
-        "/tomorrow komutu ile yarının menüsüne ulaşabilirsin.\n" +
-        "/menu 12.03.2022 ile herhangi bir günün menüsüne ulaşabilirsin.\n" +
-        "/menu komutunu kullanırken tarih biçimi gün.ay.yıl şeklinde olmalıdır.\n" +
-        "/source komutu ile projelerin kaynağına ulaşabilirsin.\n";
+    "/today komutu ile bugünün menüsüne ulaşabilirsin.\n" +
+    "/tomorrow komutu ile yarının menüsüne ulaşabilirsin.\n" +
+    "/menu 12.03.2022 ile herhangi bir günün menüsüne ulaşabilirsin.\n" +
+    "/menu komutunu kullanırken tarih biçimi gün.ay.yıl şeklinde olmalıdır.\n" +
+    "/source komutu ile projelerin kaynağına ulaşabilirsin.\n";
 
 async Task<string> generateReply(string messageText)
 {
-
     var splittedMessage = messageText.Split(' ');
     var dateNowForTurkey = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(3));
     string todayAsString = dateNowForTurkey.ToString("dd.MM.yyyy");
@@ -51,7 +54,7 @@ async Task<string> generateReply(string messageText)
     switch (splittedMessage[0].ToLower())
     {
         case "/start":
-            reply = "Heyyo! Ben Cu.Yemekhane.Bot.Telegram,\n" + helpCommand + "\nhttps://github.com/halilkocaoz/cu-yemekhane";
+            reply = "Heyyo! Ben Çukurova Üniversitesi Yemekhane botu,\n" + helpCommand + "\nhttps://github.com/halilkocaoz/cu-yemekhane";
             break;
         case "/today":
             reply = await getMenuMessage(todayAsString);
@@ -82,8 +85,16 @@ async Task<string> generateReply(string messageText)
     return reply;
 
     async Task<string> getMenuMessage(string date)
-    {   //todo cache
-        var response = await webApiService.GetMenu(date);
+    {
+        if (!memoryCache.TryGetValue(date, out Cu.Yemekhane.Common.ApiResponse<Menu> response))
+        {
+            response = await webApiService.GetMenu(date);
+            memoryCache.Set(date, response, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpiration = DateTime.Now.AddHours(36)
+            });
+        }
+
         string detail = string.Empty;
         if (string.IsNullOrEmpty(response.ErrorMessage))
             detail = response.Data is null ? $"{date} tarihi için menü bulunamadı." : response.Data.Detail;
