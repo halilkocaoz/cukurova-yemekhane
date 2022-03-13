@@ -16,7 +16,6 @@ app.MapGet("/ping", () => "pong");
 
 var serviceProvider = builder.Services.BuildServiceProvider();
 var webApiService = (IWebApiService)serviceProvider.GetService(typeof(IWebApiService));
-var memoryCache = (IMemoryCache)serviceProvider.GetService(typeof(IMemoryCache));
 
 string telegramApiToken = Environment.GetEnvironmentVariable("TELEGRAM_API_TOKEN");
 var botClient = new TelegramBotClient(telegramApiToken);
@@ -86,15 +85,7 @@ async Task<string> generateReply(string messageText)
 
     async Task<string> getMenuMessage(string date)
     {
-        if (!memoryCache.TryGetValue(date, out Cu.Yemekhane.Common.ApiResponse<Menu> response))
-        {
-            response = await webApiService.GetMenu(date);
-            memoryCache.Set(date, response, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddHours(36)
-            });
-        }
-
+        var response = await webApiService.GetMenu(date);
         string detail = string.Empty;
         if (string.IsNullOrEmpty(response.ErrorMessage))
             detail = response.Data is null ? $"{date} tarihi için menü bulunamadı." : response.Data.Detail;

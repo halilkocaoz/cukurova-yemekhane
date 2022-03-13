@@ -41,10 +41,10 @@ public class MenuService : IMenuService
         if (DateTime.TryParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime menuDate))
         {
             var menus = getCachedMenus();
-            response.Data = menus.FirstOrDefault(x => x.Date == date); // add mem cache by date
+            response.Data = menus.FirstOrDefault(x => x.Date == date);
         }
         else
-            response.ErrorMessage = "Tarih biçimi geçersiz, tarih biçimi gg.AA.yyyy(15.06.2022 -  gg = gün, AA = ay, yyyy=yıl) şeklinde olmalıdır.";
+            response.ErrorMessage = "Tarih biçimi geçersiz, tarih biçimi gg.AA.yyyy(15.06.2022 -  gg = gün, AA = ay, yyyy = yıl) şeklinde olmalıdır.";
 
         return response;
     }
