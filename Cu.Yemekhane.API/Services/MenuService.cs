@@ -38,13 +38,13 @@ public class MenuService : IMenuService
     public ApiResponse<Menu> GetMenuByDate(string date)
     {
         ApiResponse<Menu> response = new();
-        if (DateTime.TryParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime menuDate))
+        if (date.IsParseableAsDate())
         {
             var menus = getCachedMenus();
             response.Data = menus.FirstOrDefault(x => x.Date == date);
         }
         else
-            response.ErrorMessage = "Tarih biçimi geçersiz, tarih biçimi gg.AA.yyyy(15.06.2022 -  gg = gün, AA = ay, yyyy = yıl) şeklinde olmalıdır.";
+            response.ErrorMessage = ErrorMessages.InvalidDateFormat;
 
         return response;
     }

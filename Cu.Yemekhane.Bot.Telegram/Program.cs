@@ -4,8 +4,7 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Cu.Yemekhane.Common.Services;
-using Microsoft.Extensions.Caching.Memory;
-using Cu.Yemekhane.Common.Models.Data;
+using Cu.Yemekhane.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IWebApiService, WebApiService>();
@@ -56,17 +55,17 @@ async Task<string> generateReply(string messageText)
             reply = "Heyyo! Ben Çukurova Üniversitesi Yemekhane botu,\n" + helpCommand + "\nhttps://github.com/halilkocaoz/cu-yemekhane";
             break;
         case "/today":
-            reply = await getMenuMessage(todayAsString);
+            reply = await getMenuDetailMessage(todayAsString);
             break;
         case "/tomorrow":
             string tomorrowAsString = dateNowForTurkey.AddDays(1).ToString("dd.MM.yyyy");
-            reply = await getMenuMessage(tomorrowAsString);
+            reply = await getMenuDetailMessage(tomorrowAsString);
             break;
         case "/menu":
             if (splittedMessage.Length > 1)
             {
                 string selectedDay = splittedMessage[1];
-                reply = await getMenuMessage(selectedDay);
+                reply = await getMenuDetailMessage(selectedDay);
             }
             else
                 reply = $"Tarih formatında veri girmelisiniz. Örnek:\n/menu {todayAsString}";
@@ -83,14 +82,20 @@ async Task<string> generateReply(string messageText)
     };
     return reply;
 
-    async Task<string> getMenuMessage(string date)
+    async Task<string> getMenuDetailMessage(string date)
     {
-        var response = await webApiService.GetMenu(date);
         string detail = string.Empty;
-        if (string.IsNullOrEmpty(response.ErrorMessage))
-            detail = response.Data is null ? $"{date} tarihi için menü bulunamadı." : response.Data.Detail;
+        if (date.IsParseableAsDate())
+        {
+            var response = await webApiService.GetMenu(date);
+            if (string.IsNullOrEmpty(response.ErrorMessage))
+                detail = response.Data is null ? $"{date} tarihi için menü bulunamadı." : response.Data.Detail;
+            else
+                detail = response.ErrorMessage;
+        }
         else
-            detail = response.ErrorMessage;
+            detail = ErrorMessages.InvalidDateFormat;
+
         return detail;
     }
 }
