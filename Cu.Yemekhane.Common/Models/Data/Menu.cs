@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Cu.Yemekhane.Common.Data.Models;
+namespace Cu.Yemekhane.Common.Models.Data;
 
 public class Menu
 {

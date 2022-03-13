@@ -1,4 +1,4 @@
-using Cu.Yemekhane.Common.Data.Models;
+using Cu.Yemekhane.Common.Models.Data;
 using Flurl;
 using Flurl.Http;
 

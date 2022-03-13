@@ -5,7 +5,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Cu.Yemekhane.Common.Services;
 using Microsoft.Extensions.Caching.Memory;
-using Cu.Yemekhane.Common.Data.Models;
+using Cu.Yemekhane.Common.Models.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IWebApiService, WebApiService>();

@@ -1,5 +1,5 @@
 using System.Text;
-using Cu.Yemekhane.Common.Data.Models;
+using Cu.Yemekhane.Common.Models.Data;
 using HtmlAgilityPack;
 
 namespace Cu.Yemekhane.API.Services;

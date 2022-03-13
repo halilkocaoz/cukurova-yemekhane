@@ -1,4 +1,4 @@
-namespace Cu.Yemekhane.Common.Data.Models;
+namespace Cu.Yemekhane.Common.Models.Data;
 
 public class Food
 {

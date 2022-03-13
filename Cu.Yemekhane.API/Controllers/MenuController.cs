@@ -1,6 +1,6 @@
 using Cu.Yemekhane.API.Services;
 using Cu.Yemekhane.Common;
-using Cu.Yemekhane.Common.Data.Models;
+using Cu.Yemekhane.Common.Models.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cu.Yemekhane.API.Controllers;
