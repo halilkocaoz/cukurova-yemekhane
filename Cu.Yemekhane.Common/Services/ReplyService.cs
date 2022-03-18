@@ -54,8 +54,11 @@ public class ReplyService : IReplyService
             case "/help":
                 reply = helpCommand;
                 break;
+            case "/designer":
+                reply = "Bu botun profil resmi tasarımcısı Onur Akbaş.\n\nhttps://instagram.com/hw.des";
+                break;
             default:
-                reply = "Seni anlamadım. Komutlarımı görmek için /help yazabilirsin.";
+                reply = "Seni anlamadım.\nKomutlarımı görmek için /help yazabilirsin.";
                 break;
         };
         return reply;
@@ -96,6 +99,5 @@ public class ReplyService : IReplyService
         "/today komutu ile bugünün menüsüne ulaşabilirsin.\n" +
         "/tomorrow komutu ile yarının menüsüne ulaşabilirsin.\n" +
         "/menu 12.03.2022 ile herhangi bir günün menüsüne ulaşabilirsin.\n" +
-        "/menu komutunu kullanırken tarih biçimi gün.ay.yıl şeklinde olmalıdır.\n" +
-        "/source komutu ile projelerin kaynağına ulaşabilirsin.\n";
+        "/menu komutunu kullanırken tarih biçimi gün.ay.yıl şeklinde olmalıdır.\n";
 }
