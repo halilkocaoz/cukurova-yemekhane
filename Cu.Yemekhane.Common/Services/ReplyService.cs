@@ -7,7 +7,7 @@ namespace Cu.Yemekhane.Bot.Telegram.Services;
 
 public interface IReplyService
 {
-    Task<string> GenareteReplyMessage(string message);
+    Task<string> GenareteReplyMessage(string? message);
 }
 
 public class ReplyService : IReplyService
@@ -15,26 +15,38 @@ public class ReplyService : IReplyService
     private readonly IWebApiService _webApiService;
     private readonly IMemoryCache _memoryCache;
 
+    private readonly string sourceReplyMessage,
+        designerReplyMessage,
+        startReplyMessage,
+        defaultReplyMessage,
+        feedbackReplyMessge;
+
     public ReplyService(IWebApiService webApiService, IMemoryCache memoryCache)
     {
         _webApiService = webApiService;
         _memoryCache = memoryCache;
+        sourceReplyMessage = Environment.GetEnvironmentVariable("SOURCE_REPLY_MESSAGE") ?? string.Empty;
+        designerReplyMessage = Environment.GetEnvironmentVariable("DESIGNER_REPLY_MESSAGE") ?? string.Empty;
+        startReplyMessage = Environment.GetEnvironmentVariable("START_REPLY_MESSAGE") ?? string.Empty;
+        feedbackReplyMessge = Environment.GetEnvironmentVariable("FEEDBACK_REPLY_MESSAGE") ?? string.Empty;
+        defaultReplyMessage = Environment.GetEnvironmentVariable("DEFAULT_REPLY_MESSAGE") ?? string.Empty;
     }
 
-    public async Task<string> GenareteReplyMessage(string message)
+    public async Task<string> GenareteReplyMessage(string? message)
     {
         var dateNowForTurkey = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(3));
         string todayAsString = dateNowForTurkey.ToString("dd.MM.yyyy");
         string tomorrowAsString = dateNowForTurkey.AddDays(1).ToString("dd.MM.yyyy");
 
-        string? replyMessage = message switch
+        string replyMessage = message switch
         {
             "/today" => await getMenuDetailAsync(todayAsString),
             "/tomorrow" => await getMenuDetailAsync(tomorrowAsString),
-            "/source" => Environment.GetEnvironmentVariable("SOURCE_REPLY_MESSAGE"),
-            "/designer" => Environment.GetEnvironmentVariable("DESIGNER_REPLY_MESSAGE"),
-            "/start" => Environment.GetEnvironmentVariable("START_REPLY_MESSAGE"),
-            _ => Environment.GetEnvironmentVariable("DEFAULT_REPLY_MESSAGE"),
+            "/source" => sourceReplyMessage,
+            "/designer" => designerReplyMessage,
+            "/start" => startReplyMessage,
+            "/feedback" => feedbackReplyMessge,
+            _ => defaultReplyMessage,
         };
 
         return replyMessage;
