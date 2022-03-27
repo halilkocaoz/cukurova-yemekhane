@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IWebApiService, WebApiService>();
 builder.Services.AddSingleton<IReplyService, ReplyService>();
 builder.Services.AddMemoryCache();
+builder.Logging.ClearProviders();
 
 var app = builder.Build();
 app.MapGet("/ping", () => "pong");
@@ -20,7 +21,7 @@ var _replyService = serviceProvider.GetService<IReplyService>();
 string telegramApiToken = Environment.GetEnvironmentVariable("TELEGRAM_API_TOKEN");
 var botClient = new TelegramBotClient(telegramApiToken);
 botClient.StartReceiving(handleUpdateAsync,
-    handleErrorAsync,
+    handleError,
     new ReceiverOptions { AllowedUpdates = { } },
     CancellationToken.None);
 
@@ -37,7 +38,7 @@ async Task handleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
     await botClient.SendTextMessageAsync(chatId, replyMessage);
 }
 
-Task handleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+Task handleError(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
 {
     var ErrorMessage = exception switch
     {

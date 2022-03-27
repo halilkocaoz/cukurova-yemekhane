@@ -23,45 +23,21 @@ public class ReplyService : IReplyService
 
     public async Task<string> GenareteReplyMessage(string message)
     {
-        var splittedMessage = message.Split(' ');
         var dateNowForTurkey = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(3));
         string todayAsString = dateNowForTurkey.ToString("dd.MM.yyyy");
-        string reply = string.Empty;
-        switch (splittedMessage[0].ToLower())
+        string tomorrowAsString = dateNowForTurkey.AddDays(1).ToString("dd.MM.yyyy");
+
+        string? replyMessage = message switch
         {
-            case "/start":
-                reply = "Heyyo! Ben Çukurova Üniversitesi Yemekhane botu,\n" + helpCommand + "\nhttps://github.com/halilkocaoz/cu-yemekhane";
-                break;
-            case "/today":
-                reply = await getMenuDetail(todayAsString);
-                break;
-            case "/tomorrow":
-                string tomorrowAsString = dateNowForTurkey.AddDays(1).ToString("dd.MM.yyyy");
-                reply = await getMenuDetail(tomorrowAsString);
-                break;
-            case "/menu":
-                if (splittedMessage.Length > 1)
-                {
-                    string selectedDay = splittedMessage[1];
-                    reply = await getMenuDetail(selectedDay);
-                }
-                else
-                    reply = $"Tarih formatında veri girmelisiniz. Örnek:\n/menu {todayAsString}";
-                break;
-            case "/source":
-                reply = "https://github.com/halilkocaoz/cu-yemekhane";
-                break;
-            case "/help":
-                reply = helpCommand;
-                break;
-            case "/designer":
-                reply = "Bu botun profil resmi tasarımcısı Onur Akbaş.\n\nhttps://instagram.com/hw.des";
-                break;
-            default:
-                reply = "Seni anlamadım.\nKomutlarımı görmek için /help yazabilirsin.";
-                break;
+            "/today" => await getMenuDetailAsync(todayAsString),
+            "/tomorrow" => await getMenuDetailAsync(tomorrowAsString),
+            "/source" => Environment.GetEnvironmentVariable("SOURCE_REPLY_MESSAGE"),
+            "/designer" => Environment.GetEnvironmentVariable("DESIGNER_REPLY_MESSAGE"),
+            "/start" => Environment.GetEnvironmentVariable("START_REPLY_MESSAGE"),
+            _ => Environment.GetEnvironmentVariable("DEFAULT_REPLY_MESSAGE"),
         };
-        return reply;
+
+        return replyMessage;
     }
 
     async Task<ApiResponse<List<Menu>>> getMenusResponseFromCache()
@@ -78,26 +54,18 @@ public class ReplyService : IReplyService
         return response;
     }
 
-    async Task<string> getMenuDetail(string date)
+    async Task<string> getMenuDetailAsync(string date)
     {
         string menuDetailReply = string.Empty;
         if (date.IsParseableAsDate())
         {
             var menusResponse = await getMenusResponseFromCache();
             var selectedMenu = menusResponse.Data?.FirstOrDefault(x => x.Date == date);
-            menuDetailReply = selectedMenu is not null
-                ? selectedMenu.Detail
-                : $"{date} tarihi için menü bulunamadı.";
+            menuDetailReply = selectedMenu?.Detail ?? $"{date} tarihi için menü bulunamadı.";
         }
         else
             menuDetailReply = ErrorMessages.InvalidDateFormat;
 
         return menuDetailReply;
     }
-
-    const string helpCommand = "Sana Çukurova Üniversitesinin yemekhane menülerine ulaşman konusunda yardımcı olabilirim.\n" +
-        "/today komutu ile bugünün menüsüne ulaşabilirsin.\n" +
-        "/tomorrow komutu ile yarının menüsüne ulaşabilirsin.\n" +
-        "/menu 12.03.2022 ile herhangi bir günün menüsüne ulaşabilirsin.\n" +
-        "/menu komutunu kullanırken tarih biçimi gün.ay.yıl şeklinde olmalıdır.\n";
 }
