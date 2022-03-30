@@ -19,7 +19,7 @@ public class ReplyService : IReplyService
         designerReplyMessage,
         startReplyMessage,
         defaultReplyMessage,
-        feedbackReplyMessge;
+        developerReplyMessge;
 
     public ReplyService(IWebApiService webApiService, IMemoryCache memoryCache)
     {
@@ -28,7 +28,7 @@ public class ReplyService : IReplyService
         sourceReplyMessage = Environment.GetEnvironmentVariable("SOURCE_REPLY_MESSAGE") ?? string.Empty;
         designerReplyMessage = Environment.GetEnvironmentVariable("DESIGNER_REPLY_MESSAGE") ?? string.Empty;
         startReplyMessage = Environment.GetEnvironmentVariable("START_REPLY_MESSAGE") ?? string.Empty;
-        feedbackReplyMessge = Environment.GetEnvironmentVariable("FEEDBACK_REPLY_MESSAGE") ?? string.Empty;
+        developerReplyMessge = Environment.GetEnvironmentVariable("DEVELOPER_REPLY_MESSAGE") ?? string.Empty;
         defaultReplyMessage = Environment.GetEnvironmentVariable("DEFAULT_REPLY_MESSAGE") ?? string.Empty;
     }
 
@@ -45,7 +45,7 @@ public class ReplyService : IReplyService
             "/source" => sourceReplyMessage,
             "/designer" => designerReplyMessage,
             "/start" => startReplyMessage,
-            "/feedback" => feedbackReplyMessge,
+            "/developer" => developerReplyMessge,
             _ => defaultReplyMessage,
         };
 
