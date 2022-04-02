@@ -1,6 +1,6 @@
 using System.Globalization;
-
 namespace Cu.Yemekhane.Common;
+
 public static class StringExtensions
 {
     public static bool IsParseableAsDate(this string value)

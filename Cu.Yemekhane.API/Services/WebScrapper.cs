@@ -15,8 +15,8 @@ public class WebScrapper : IWebScrapper
     private const string cuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
     public WebScrapper()
     {
-        System.Text.EncodingProvider provider = System.Text.CodePagesEncodingProvider.Instance;
-        Encoding.RegisterProvider(provider);
+        EncodingProvider encodingProvider = CodePagesEncodingProvider.Instance;
+        Encoding.RegisterProvider(encodingProvider);
         _htmlWeb = new HtmlWeb
         {
             AutoDetectEncoding = false,

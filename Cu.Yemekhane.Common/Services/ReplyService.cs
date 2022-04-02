@@ -1,4 +1,5 @@
 using Cu.Yemekhane.Common;
+using Cu.Yemekhane.Common.Models;
 using Cu.Yemekhane.Common.Models.Data;
 using Cu.Yemekhane.Common.Services;
 using Microsoft.Extensions.Caching.Memory;

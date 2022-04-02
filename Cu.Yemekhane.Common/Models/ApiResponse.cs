@@ -1,5 +1,5 @@
 
-namespace Cu.Yemekhane.Common;
+namespace Cu.Yemekhane.Common.Models;
 public struct ApiResponse<T>
 {
     public bool Success => string.IsNullOrEmpty(ErrorMessage) ? true : false;
