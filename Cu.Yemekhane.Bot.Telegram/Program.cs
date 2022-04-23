@@ -16,7 +16,7 @@ var app = builder.Build();
 app.MapGet("/ping", () => "pong");
 
 var serviceProvider = builder.Services.BuildServiceProvider();
-var _replyService = serviceProvider.GetService<IReplyService>() ?? throw new ArgumentNullException(nameof(IReplyService));
+IReplyService _replyService = serviceProvider.GetRequiredService<IReplyService>();
 var telegramApiToken = Environment.GetEnvironmentVariable("TELEGRAM_API_TOKEN") ?? throw new ArgumentNullException("TELEGRAM_API_TOKEN");
 
 var botClient = new TelegramBotClient(telegramApiToken);

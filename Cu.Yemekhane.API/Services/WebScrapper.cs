@@ -42,7 +42,7 @@ public class WebScrapper : IWebScrapper
                 menuFoodNodes.ForEach(menuFoodNode =>
                 {
                     var foodName = menuFoodNode.ChildNodes.First().InnerText.Trim();
-                    var foodCalories = int.Parse(menuFoodNode.ChildNodes.Last().InnerText.Replace("Kalori", "").Trim());
+                    int.TryParse(menuFoodNode.ChildNodes.Last().InnerText.Replace("Kalori", "").Trim(), out int foodCalories);
                     tempFoods.Add(new Food(foodName, foodCalories));
                 });
                 result.Add(new Menu(menuDate, tempFoods, 0));
