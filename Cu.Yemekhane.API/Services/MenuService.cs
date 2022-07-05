@@ -8,7 +8,7 @@ namespace Cu.Yemekhane.API.Services;
 public interface IMenuService
 {
     ApiResponse<List<Menu>> GetMenus();
-    ApiResponse<Menu> GetMenuByDate(string date);
+    ApiResponse<Menu> GetMenu(string date);
 }
 
 public class MenuService : IMenuService
@@ -24,21 +24,21 @@ public class MenuService : IMenuService
 
     private List<Menu> getCachedMenus()
     {
-        if (!_memoryCache.TryGetValue("menus_cache", out List<Menu> menus))
+        if (_memoryCache.TryGetValue("menus_cache", out List<Menu> menus)) 
+            return menus;
+        
+        menus = _webScrapper.ScrapMenus();
+        _memoryCache.Set("menus_cache", menus, new MemoryCacheEntryOptions
         {
-            menus = _webScrapper.ScrapMenus();
-            _memoryCache.Set("menus_cache", menus, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddHours(6)
-            });
-        }
+            AbsoluteExpiration = DateTime.Now.AddHours(6)
+        });
         return menus;
     }
 
-    public ApiResponse<Menu> GetMenuByDate(string date)
+    public ApiResponse<Menu> GetMenu(string date)
     {
         ApiResponse<Menu> response = new();
-        if (date.IsParseableAsDate())
+        if (date.ParseableAsDate())
         {
             var menus = getCachedMenus();
             response.Data = menus.FirstOrDefault(x => x.Date == date);

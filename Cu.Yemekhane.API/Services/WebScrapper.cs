@@ -12,7 +12,7 @@ public interface IWebScrapper
 public class WebScrapper : IWebScrapper
 {
     private readonly HtmlWeb _htmlWeb;
-    private const string cuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
+    private const string CuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
     public WebScrapper()
     {
         EncodingProvider encodingProvider = CodePagesEncodingProvider.Instance;
@@ -28,26 +28,25 @@ public class WebScrapper : IWebScrapper
     {
         List<Menu> result = new();
         List<Food> tempFoods = new();
-        var doc = _htmlWeb.Load(cuYemekhaneUrl);
+        var doc = _htmlWeb.Load(CuYemekhaneUrl);
         var menuDivNodes = doc.DocumentNode.SelectNodes("//div[@data-animation='flipInY']").ToList();
         menuDivNodes.ForEach(menuDivNode =>
         {
             var menuDivAElementNodes = menuDivNode.Descendants().Where(x => x.OriginalName == "a").ToList();
             var menuHasItems = menuDivAElementNodes.Any();
-            if (menuHasItems)
+            if (menuHasItems is false) return;
+
+            var menuDateInformationNode = menuDivAElementNodes.First().ChildNodes;
+            var menuDate = menuDateInformationNode.First().InnerText;
+            var menuFoodNodes = menuDivAElementNodes.Skip(1).ToList();
+            menuFoodNodes.ForEach(menuFoodNode =>
             {
-                var menuDateInformationNode = menuDivAElementNodes.First().ChildNodes;
-                var menuDate = menuDateInformationNode.First().InnerText;
-                var menuFoodNodes = menuDivAElementNodes.Skip(1).ToList();
-                menuFoodNodes.ForEach(menuFoodNode =>
-                {
-                    var foodName = menuFoodNode.ChildNodes.First().InnerText.Trim();
-                    int.TryParse(menuFoodNode.ChildNodes.Last().InnerText.Replace("Kalori", "").Trim(), out int foodCalories);
-                    tempFoods.Add(new Food(foodName, foodCalories));
-                });
-                result.Add(new Menu(menuDate, tempFoods, 0));
-                tempFoods = new();
-            }
+                var foodName = menuFoodNode.ChildNodes.First().InnerText.Trim();
+                _ = int.TryParse(menuFoodNode.ChildNodes.Last().InnerText.Replace("Kalori", "").Trim(), out int foodCalories);
+                tempFoods.Add(new Food(foodName, foodCalories));
+            });
+            result.Add(new Menu(menuDate, tempFoods, 0));
+            tempFoods = new List<Food>();
         });
         return result;
     }

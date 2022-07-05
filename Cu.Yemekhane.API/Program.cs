@@ -12,9 +12,9 @@ builder.Services.AddSingleton<IMenuService, MenuService>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("default", builder =>
+    options.AddPolicy("default", corsPolicyBuilder =>
     {
-        builder
+        corsPolicyBuilder
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowAnyOrigin();
@@ -27,7 +27,7 @@ app.UseSwagger();
 app.UseSwaggerUI(conf =>
 {
     conf.SwaggerEndpoint("/swagger/v1/swagger.json", "Cu.Yemekhane.API");
-    conf.RoutePrefix = String.Empty;
+    conf.RoutePrefix = string.Empty;
 });
 app.UseCors("default");
 

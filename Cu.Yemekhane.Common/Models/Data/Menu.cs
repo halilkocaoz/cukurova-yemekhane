@@ -9,7 +9,7 @@ public class Menu
         Date = date;
         Foods = foods;
         TotalCalories = totalCalories is 0 or null ? foods.Sum(x => x.Calories) : totalCalories.Value;
-        Detail = this.ToString();
+        Detail = ToString();
     }
 
     public string Date { get; private set; }
@@ -17,10 +17,10 @@ public class Menu
     public int TotalCalories { get; private set; }
     public string Detail { get; private set; }
 
-    public override string ToString()
+    public sealed override string ToString()
     {
-        StringBuilder detailStrBuilder = new StringBuilder($"Menu({Date}):");
-        Foods.ForEach(food => detailStrBuilder.Append($"\n{food.ToString()}"));
+        var detailStrBuilder = new StringBuilder($"Menu({Date}):");
+        Foods.ForEach(food => detailStrBuilder.Append($"\n{food}"));
         return detailStrBuilder.ToString();
     }
 }

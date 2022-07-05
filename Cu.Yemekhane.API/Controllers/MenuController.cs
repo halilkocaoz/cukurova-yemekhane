@@ -1,5 +1,4 @@
 using Cu.Yemekhane.API.Services;
-using Cu.Yemekhane.Common;
 using Cu.Yemekhane.Common.Models;
 using Cu.Yemekhane.Common.Models.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -20,5 +19,5 @@ public class MenuController : ControllerBase
 
     [HttpGet("{date}")]
     public ApiResponse<Menu> GetMenu([FromRoute] string date)
-        => _menuService.GetMenuByDate(date);
+        => _menuService.GetMenu(date);
 }

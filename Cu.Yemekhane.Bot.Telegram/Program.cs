@@ -1,5 +1,4 @@
 ﻿using Cu.Yemekhane.Common.Services;
-using Cu.Yemekhane.Bot.Telegram.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -16,16 +15,16 @@ var app = builder.Build();
 app.MapGet("/ping", () => "pong");
 
 var serviceProvider = builder.Services.BuildServiceProvider();
-IReplyService _replyService = serviceProvider.GetRequiredService<IReplyService>();
+var replyService = serviceProvider.GetRequiredService<IReplyService>();
 var telegramApiToken = Environment.GetEnvironmentVariable("TELEGRAM_API_TOKEN") ?? throw new ArgumentNullException("TELEGRAM_API_TOKEN");
 
-var botClient = new TelegramBotClient(telegramApiToken);
-botClient.StartReceiving(handleUpdateAsync,
+var telegramBotClient = new TelegramBotClient(telegramApiToken);
+telegramBotClient.StartReceiving(handleUpdateAsync,
     handleError,
-    new ReceiverOptions { AllowedUpdates = { } },
+    new ReceiverOptions(),
     CancellationToken.None);
 
-async Task handleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+async Task handleUpdateAsync(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
 {
     if (update.Type != UpdateType.Message || update.Message!.Type != MessageType.Text)
         return;
@@ -34,20 +33,20 @@ async Task handleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
     var messageText = update.Message.Text;
 
     Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
-    var replyMessage = await _replyService.GenareteReplyMessage(messageText);
-    await botClient.SendTextMessageAsync(chatId, replyMessage);
+    var replyMessage = await replyService.GenerateReplyMessage(messageText);
+    await client.SendTextMessageAsync(chatId, replyMessage, cancellationToken: cancellationToken);
 }
 
-Task handleError(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+Task handleError(ITelegramBotClient client, Exception exception, CancellationToken cancellationToken)
 {
-    var ErrorMessage = exception switch
+    var errorMessage = exception switch
     {
         ApiRequestException apiRequestException
             => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
         _ => exception.ToString()
     };
 
-    Console.WriteLine(ErrorMessage);
+    Console.WriteLine(errorMessage);
     return Task.CompletedTask;
 }
 
