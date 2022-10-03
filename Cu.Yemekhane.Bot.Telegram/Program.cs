@@ -34,7 +34,14 @@ async Task handleUpdateAsync(ITelegramBotClient client, Update update, Cancellat
 
     Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
     var replyMessage = await replyService.GenerateReplyMessage(messageText);
-    await client.SendTextMessageAsync(chatId, replyMessage, cancellationToken: cancellationToken);
+    try
+    {
+        await client.SendTextMessageAsync(chatId, replyMessage, cancellationToken: cancellationToken);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+    }
 }
 
 Task handleError(ITelegramBotClient client, Exception exception, CancellationToken cancellationToken)
