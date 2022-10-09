@@ -3,7 +3,10 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Exceptions;
-using Telegram.Bot.Extensions.Polling;
+
+const string tokenVariable = "TELEGRAM_API_TOKEN";
+var telegramApiToken = Environment.GetEnvironmentVariable(tokenVariable) 
+                       ?? throw new NullReferenceException(nameof(tokenVariable));
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IWebApiService, WebApiService>();
@@ -14,29 +17,23 @@ builder.Logging.ClearProviders();
 var app = builder.Build();
 app.MapGet("/ping", () => "pong");
 
-var serviceProvider = builder.Services.BuildServiceProvider();
-var replyService = serviceProvider.GetRequiredService<IReplyService>();
-var telegramApiToken = Environment.GetEnvironmentVariable("TELEGRAM_API_TOKEN") ?? throw new ArgumentNullException("TELEGRAM_API_TOKEN");
+var replyService = app.Services.GetRequiredService<IReplyService>();
+var botClient = new TelegramBotClient(telegramApiToken);
+botClient.StartReceiving(HandleUpdateAsync, HandleError);
 
-var telegramBotClient = new TelegramBotClient(telegramApiToken);
-telegramBotClient.StartReceiving(handleUpdateAsync,
-    handleError,
-    new ReceiverOptions(),
-    CancellationToken.None);
-
-async Task handleUpdateAsync(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
+async Task HandleUpdateAsync(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
 {
     if (update.Type != UpdateType.Message || update.Message!.Type != MessageType.Text)
         return;
-
+    
     var chatId = update.Message.Chat.Id;
     var messageText = update.Message.Text;
 
-    Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
-    var replyMessage = await replyService.GenerateReplyMessage(messageText);
+    Console.WriteLine($"'{messageText}' in {chatId}.");
+    var message = await replyService.GenerateReplyMessage(messageText);
     try
     {
-        await client.SendTextMessageAsync(chatId, replyMessage, cancellationToken: cancellationToken);
+        await client.SendTextMessageAsync(chatId, message, cancellationToken: cancellationToken);
     }
     catch (Exception e)
     {
@@ -44,7 +41,7 @@ async Task handleUpdateAsync(ITelegramBotClient client, Update update, Cancellat
     }
 }
 
-Task handleError(ITelegramBotClient client, Exception exception, CancellationToken cancellationToken)
+Task HandleError(ITelegramBotClient client, Exception exception, CancellationToken cancellationToken)
 {
     var errorMessage = exception switch
     {

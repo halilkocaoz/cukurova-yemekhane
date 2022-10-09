@@ -12,10 +12,10 @@ public class Menu
         Detail = ToString();
     }
 
-    public string Date { get; private set; }
-    public List<Food> Foods { get; private set; }
-    public int TotalCalories { get; private set; }
-    public string Detail { get; private set; }
+    public string Date { get; }
+    public List<Food> Foods { get; }
+    public int TotalCalories { get; }
+    public string Detail { get; }
 
     public sealed override string ToString()
     {

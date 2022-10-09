@@ -54,7 +54,7 @@ public class ReplyService : IReplyService
     private async Task<string> GetReplyMessage(string date)
     {
         const string cacheKey = $"{nameof(ReplyService)}";
-        var responseOnCache = _memoryCache.TryGetValue(cacheKey, out ApiResponse<List<Menu>> response)
+        var responseOnCache = _memoryCache.TryGetValue(cacheKey, out ApiResponse<List<Menu>> response);
         if (responseOnCache is false)
         {
             response = await _webApiService.GetMenu();

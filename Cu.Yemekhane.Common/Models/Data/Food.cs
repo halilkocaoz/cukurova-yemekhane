@@ -8,8 +8,8 @@ public class Food
         Calories = calories;
     }
 
-    public string Name { get; private set; }
-    public int Calories { get; private set; }
+    public string Name { get; }
+    public int Calories { get; }
 
     public override string ToString()
     {
