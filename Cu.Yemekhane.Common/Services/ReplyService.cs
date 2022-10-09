@@ -39,8 +39,8 @@ public class ReplyService : IReplyService
 
         var replyMessage = message switch
         {
-            "/today" => await getMenuDetailAsync(todayAsString),
-            "/tomorrow" => await getMenuDetailAsync(tomorrowAsString),
+            "/today" => await GetReplyMessage(todayAsString),
+            "/tomorrow" => await GetReplyMessage(tomorrowAsString),
             "/source" => _sourceReplyMessage,
             "/designer" => _designerReplyMessage,
             "/start" => _startReplyMessage,
@@ -51,32 +51,23 @@ public class ReplyService : IReplyService
         return replyMessage;
     }
 
-    async Task<ApiResponse<List<Menu>>> getMenusResponseFromCache()
+    private async Task<string> GetReplyMessage(string date)
     {
-        const string cacheKey = "menus_response_cache";
-        if (_memoryCache.TryGetValue(cacheKey, out ApiResponse<List<Menu>> response)) 
-            return response;
+        const string cacheKey = $"{nameof(ReplyService)}";
+        var responseOnCache = _memoryCache.TryGetValue(cacheKey, out ApiResponse<List<Menu>> response)
+        if (responseOnCache is false)
+        {
+            response = await _webApiService.GetMenu();
+            if (response.Success is false) 
+                return response.ErrorMessage;
         
-        response = await _webApiService.GetMenus();
-        _memoryCache.Set(cacheKey, response, new MemoryCacheEntryOptions
-        {
-            AbsoluteExpiration = DateTime.Now.AddHours(6)
-        });
-        return response;
-    }
-
-    async Task<string> getMenuDetailAsync(string date)
-    {
-        string menuDetailReply;
-        if (date.ParseableAsDate())
-        {
-            var menusResponse = await getMenusResponseFromCache();
-            var selectedMenu = menusResponse.Data?.FirstOrDefault(x => x.Date == date);
-            menuDetailReply = selectedMenu?.Detail ?? $"{date} tarihi için menü bulunamadı.";
+            _memoryCache.Set(cacheKey, response, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpiration = DateTime.Now.AddHours(6)
+            });
         }
-        else
-            menuDetailReply = ErrorMessages.InvalidDateFormat;
 
-        return menuDetailReply;
+        var selectedMenu = response.Data?.FirstOrDefault(x => x.Date == date);
+        return selectedMenu?.Detail ?? $"{date} tarihi için menü bulunamadı.";    
     }
 }
