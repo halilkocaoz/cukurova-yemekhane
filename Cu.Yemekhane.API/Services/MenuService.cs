@@ -7,7 +7,7 @@ namespace Cu.Yemekhane.API.Services;
 
 public interface IMenuService
 {
-    ApiResponse<List<Menu>> GetMenus();
+    ApiResponse<List<Menu>> GetMenu();
     ApiResponse<Menu> GetMenu(string date);
 }
 
@@ -22,13 +22,17 @@ public class MenuService : IMenuService
         _memoryCache = memoryCache;
     }
 
-    private List<Menu> getCachedMenus()
+    private List<Menu> GetCachedMenus()
     {
-        if (_memoryCache.TryGetValue("menus_cache", out List<Menu> menus)) 
+        const string cacheKey = $"{nameof(MenuService)}_menus";
+        if (_memoryCache.TryGetValue(cacheKey, out List<Menu> menus)) 
             return menus;
         
         menus = _webScrapper.ScrapMenus();
-        _memoryCache.Set("menus_cache", menus, new MemoryCacheEntryOptions
+        if (menus.Count is 0)
+            throw new ApiException($"Scraping is failed or no menu found from {WebScrapper.CuYemekhaneUrl}");
+        
+        _memoryCache.Set(cacheKey, menus, new MemoryCacheEntryOptions
         {
             AbsoluteExpiration = DateTime.Now.AddHours(6)
         });
@@ -40,7 +44,7 @@ public class MenuService : IMenuService
         ApiResponse<Menu> response = new();
         if (date.ParseableAsDate())
         {
-            var menus = getCachedMenus();
+            var menus = GetCachedMenus();
             response.Data = menus.FirstOrDefault(x => x.Date == date);
         }
         else
@@ -49,11 +53,11 @@ public class MenuService : IMenuService
         return response;
     }
 
-    public ApiResponse<List<Menu>> GetMenus()
+    public ApiResponse<List<Menu>> GetMenu()
     {
         return new ApiResponse<List<Menu>>
         {
-            Data = getCachedMenus()
+            Data = GetCachedMenus()
         };
     }
 }

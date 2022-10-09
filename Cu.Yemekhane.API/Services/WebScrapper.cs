@@ -12,7 +12,7 @@ public interface IWebScrapper
 public class WebScrapper : IWebScrapper
 {
     private readonly HtmlWeb _htmlWeb;
-    private const string CuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
+    public static string CuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
     public WebScrapper()
     {
         EncodingProvider encodingProvider = CodePagesEncodingProvider.Instance;
@@ -29,8 +29,8 @@ public class WebScrapper : IWebScrapper
         List<Menu> result = new();
         List<Food> tempFoods = new();
         var doc = _htmlWeb.Load(CuYemekhaneUrl);
-        var menuDivNodes = doc.DocumentNode.SelectNodes("//div[@data-animation='flipInY']").ToList();
-        menuDivNodes.ForEach(menuDivNode =>
+        var menuDivNodes = doc?.DocumentNode?.SelectNodes("//div[@data-animation='flipInY']")?.ToList();
+        menuDivNodes?.ForEach(menuDivNode =>
         {
             var menuDivAElementNodes = menuDivNode.Descendants().Where(x => x.OriginalName == "a").ToList();
             var menuHasItems = menuDivAElementNodes.Any();
