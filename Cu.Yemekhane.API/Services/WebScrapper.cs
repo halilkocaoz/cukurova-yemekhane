@@ -11,11 +11,12 @@ public interface IWebScrapper
 
 public class WebScrapper : IWebScrapper
 {
+    public const string CuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
+    
     private readonly HtmlWeb _htmlWeb;
-    public static string CuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
     public WebScrapper()
     {
-        EncodingProvider encodingProvider = CodePagesEncodingProvider.Instance;
+        var encodingProvider = CodePagesEncodingProvider.Instance;
         Encoding.RegisterProvider(encodingProvider);
         _htmlWeb = new HtmlWeb
         {

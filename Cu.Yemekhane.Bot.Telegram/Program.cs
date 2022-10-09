@@ -5,8 +5,8 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Exceptions;
 
 const string tokenVariable = "TELEGRAM_API_TOKEN";
-var telegramApiToken = Environment.GetEnvironmentVariable(tokenVariable) 
-                       ?? throw new NullReferenceException(nameof(tokenVariable));
+var telegramApiToken = Environment.GetEnvironmentVariable(tokenVariable)
+                       ?? throw new Exception($"Environment variable {tokenVariable} is not set.");
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IWebApiService, WebApiService>();
