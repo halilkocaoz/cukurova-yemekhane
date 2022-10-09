@@ -1,4 +1,3 @@
-using System.Net;
 using Cu.Yemekhane.Common.Models;
 using Newtonsoft.Json;
 

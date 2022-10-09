@@ -25,13 +25,13 @@ public class MenuService : IMenuService
     private List<Menu> GetCachedMenus()
     {
         const string cacheKey = $"{nameof(MenuService)}_menus";
-        if (_memoryCache.TryGetValue(cacheKey, out List<Menu> menus)) 
+        if (_memoryCache.TryGetValue(cacheKey, out List<Menu> menus))
             return menus;
-        
+
         menus = _webScrapper.ScrapMenus();
         if (menus.Count is 0)
             throw new ApiException($"Scraping is failed or no menu found from {WebScrapper.CuYemekhaneUrl}");
-        
+
         _memoryCache.Set(cacheKey, menus, new MemoryCacheEntryOptions
         {
             AbsoluteExpiration = DateTime.Now.AddHours(6)

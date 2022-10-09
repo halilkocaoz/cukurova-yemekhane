@@ -19,13 +19,13 @@ app.MapGet("/ping", () => "pong");
 
 var replyService = app.Services.GetRequiredService<IReplyService>();
 var botClient = new TelegramBotClient(telegramApiToken);
-botClient.StartReceiving(HandleUpdateAsync, HandleError);
+botClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync);
 
 async Task HandleUpdateAsync(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
 {
     if (update.Type != UpdateType.Message || update.Message!.Type != MessageType.Text)
         return;
-    
+
     var chatId = update.Message.Chat.Id;
     var messageText = update.Message.Text;
 
@@ -41,7 +41,7 @@ async Task HandleUpdateAsync(ITelegramBotClient client, Update update, Cancellat
     }
 }
 
-Task HandleError(ITelegramBotClient client, Exception exception, CancellationToken cancellationToken)
+Task HandleErrorAsync(ITelegramBotClient client, Exception exception, CancellationToken cancellationToken)
 {
     var errorMessage = exception switch
     {

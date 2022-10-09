@@ -58,16 +58,16 @@ public class ReplyService : IReplyService
         if (responseOnCache is false)
         {
             response = await _webApiService.GetMenu();
-            if (response.Success is false) 
+            if (response.Success is false)
                 return response.ErrorMessage;
-        
+
             _memoryCache.Set(cacheKey, response, new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddHours(6)
+                AbsoluteExpiration = DateTime.Now.AddHours(72)
             });
         }
 
         var selectedMenu = response.Data?.FirstOrDefault(x => x.Date == date);
-        return selectedMenu?.Detail ?? $"{date} tarihi için menü bulunamadı.";    
+        return selectedMenu?.Detail ?? $"{date} tarihi için menü bulunamadı.";
     }
 }

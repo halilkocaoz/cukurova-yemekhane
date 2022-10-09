@@ -12,8 +12,9 @@ public interface IWebScrapper
 public class WebScrapper : IWebScrapper
 {
     public const string CuYemekhaneUrl = "https://yemekhane.cu.edu.tr/default.asp";
-    
+
     private readonly HtmlWeb _htmlWeb;
+
     public WebScrapper()
     {
         var encodingProvider = CodePagesEncodingProvider.Instance;
@@ -43,7 +44,8 @@ public class WebScrapper : IWebScrapper
             menuFoodNodes.ForEach(menuFoodNode =>
             {
                 var foodName = menuFoodNode.ChildNodes.First().InnerText.Trim();
-                _ = int.TryParse(menuFoodNode.ChildNodes.Last().InnerText.Replace("Kalori", "").Trim(), out int foodCalories);
+                _ = int.TryParse(menuFoodNode.ChildNodes.Last().InnerText.Replace("Kalori", "").Trim(),
+                    out int foodCalories);
                 tempFoods.Add(new Food(foodName, foodCalories));
             });
             result.Add(new Menu(menuDate, tempFoods, 0));

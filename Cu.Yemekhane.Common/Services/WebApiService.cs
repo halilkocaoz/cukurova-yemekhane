@@ -18,7 +18,7 @@ public class WebApiService : IWebApiService
 
     public async Task<ApiResponse<List<Menu>>> GetMenu()
         => await _request.GetJsonAsync<ApiResponse<List<Menu>>>();
-    
+
     public Task<ApiResponse<Menu>> GetMenu(string date)
         => _request.AppendPathSegment(date).GetJsonAsync<ApiResponse<Menu>>();
 }

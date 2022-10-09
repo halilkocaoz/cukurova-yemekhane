@@ -8,10 +8,8 @@ builder.Services.AddSingleton<IWebScrapper, WebScrapper>();
 builder.Services.AddSingleton<IMenuService, MenuService>();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("default", corsPolicyBuilder =>
-    {
-        corsPolicyBuilder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
-    });
+    options.AddPolicy("default",
+        corsPolicyBuilder => { corsPolicyBuilder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); });
 });
 
 var app = builder.Build();
