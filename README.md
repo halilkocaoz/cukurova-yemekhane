@@ -11,3 +11,8 @@ Presents Web API and bots of Çukurova University dining hall.
 ## Cu.Yemekhane.Bot.Telegram
 
 [https://t.me/cuyemekbot](https://t.me/cuyemekbot)
+
+
+## Cu.Yemekhane.Bot.Discord
+
+[Discord Bot Invite URL](https://discord.com/api/oauth2/authorize?client_id=1042368831592616000&permissions=8&scope=bot%20applications.commands)
