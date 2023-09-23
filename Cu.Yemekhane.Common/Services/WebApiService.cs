@@ -14,7 +14,7 @@ public class WebApiService : IWebApiService
 {
     private const string BaseUrl = "https://cu-yemekhane.herokuapp.com/";
     private static IFlurlRequest _request = null!;
-    public WebApiService() => _request = BaseUrl.AllowHttpStatus("500").AppendPathSegment("menu");
+    public WebApiService() => _request = BaseUrl.AllowAnyHttpStatus().AppendPathSegment("menu");
 
     public async Task<ApiResponse<List<Menu>>> GetMenu()
         => await _request.GetJsonAsync<ApiResponse<List<Menu>>>();
