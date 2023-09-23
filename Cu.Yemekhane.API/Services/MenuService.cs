@@ -30,7 +30,7 @@ public class MenuService : IMenuService
 
         menus = _webScrapper.ScrapMenus();
         if (menus.Count is 0)
-            throw new ApiException($"Scraping is failed or no menu found from {WebScrapper.CuYemekhaneUrl}");
+            throw new ApiException($"Scraping is failed or no menu found from: {WebScrapper.CuYemekhaneUrl}");
 
         _memoryCache.Set(cacheKey, menus, new MemoryCacheEntryOptions
         {
@@ -48,7 +48,7 @@ public class MenuService : IMenuService
             response.Data = menus.FirstOrDefault(x => x.Date == date);
         }
         else
-            response.ErrorMessage = ErrorMessages.InvalidDateFormat;
+            throw new ApiException(ErrorMessages.InvalidDateFormat);
 
         return response;
     }

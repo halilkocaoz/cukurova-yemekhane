@@ -1,5 +1,5 @@
+using System.Text.Json;
 using Cu.Yemekhane.Common.Models;
-using Newtonsoft.Json;
 
 namespace Cu.Yemekhane.API.Middlewares;
 
@@ -8,10 +8,10 @@ public class UnhandledExceptionsMiddleware
     private readonly RequestDelegate _next;
 
     public UnhandledExceptionsMiddleware(RequestDelegate next) => _next = next;
-    
+
     public async Task Invoke(HttpContext context)
     {
-        var response = new ApiResponse<object>();
+        var apiResponse = new ApiResponse<object>();
 
         try
         {
@@ -19,21 +19,21 @@ public class UnhandledExceptionsMiddleware
         }
         catch (ApiException exception)
         {
-            var message = $"Api exception: {exception.Message}.";
+            var message = $"Api exception: {exception.Message}";
 
-            response.ErrorMessage = message;
-            context.Response.StatusCode = 200;
+            apiResponse.ErrorMessage = message;
+            context.Response.StatusCode = 400;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
+            await context.Response.WriteAsync(JsonSerializer.Serialize(apiResponse));
         }
         catch (Exception exception)
         {
-            var message = $"Internal server error: {exception.Message}.";
+            var message = $"Internal server error: {exception.Message}";
 
-            response.ErrorMessage = message;
+            apiResponse.ErrorMessage = message;
             context.Response.StatusCode = 500;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
+            await context.Response.WriteAsync(JsonSerializer.Serialize(apiResponse));
         }
     }
 }

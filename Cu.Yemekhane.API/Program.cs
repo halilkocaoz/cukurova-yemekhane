@@ -1,3 +1,4 @@
+using Cu.Yemekhane.API.Middlewares;
 using Cu.Yemekhane.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.MapGet("menu", (IMenuService menuService) => menuService.GetMenu());
 app.MapGet("menu/{date}", (string date, IMenuService menuService) => menuService.GetMenu(date));
+app.UseMiddleware<UnhandledExceptionsMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
