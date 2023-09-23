@@ -22,7 +22,7 @@ public class UnhandledExceptionsMiddleware
             var message = $"Api exception: {exception.Message}.";
 
             response.ErrorMessage = message;
-            context.Response.StatusCode = 200;
+            context.Response.StatusCode = 400;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
         }
